@@ -1,0 +1,31 @@
+.player {
+    padding: 0 20px;
+    margin-top: 2px;
+
+    .playerInfo {
+        color: #bdbeca;
+        display: flex;
+        align-items: center;
+        padding: 5px;
+        font-size: 1.1rem;
+        cursor: pointer;
+
+        &:hover {
+            color: white;
+            background-color: #3e4d75;
+            border-radius: 7px;
+        }
+    }
+
+    .playerHash {
+        font-size: 22px;
+        padding-right: 10px;
+        margin-left: 5px;
+    }
+}
+
+.playerInfo.selected {
+    color: white;
+    background-color: #3e4d75;
+    border-radius: 7px;
+}

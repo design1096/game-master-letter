@@ -1,0 +1,27 @@
+.commentFirstInner {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+
+    .MuiAvatar-root {
+        background-color: #29355f;
+    }
+
+    .commentFirstInfo {
+        padding: 20px 20px 20px 15px;
+
+        h4 {
+          font-weight: 100;
+        }
+
+        .commentText {
+            white-space: pre-wrap;
+        }
+    }
+
+    .commentTimeStamp {
+        color: #7b7c85;
+        margin-left: 20px;
+        font-size: 16px;
+    }
+}

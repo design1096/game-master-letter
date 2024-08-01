@@ -1,0 +1,124 @@
+.commentInner {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+
+    .commentInfo {
+        padding: 20px 20px 20px 15px;
+        width: auto;
+
+        h4 {
+          font-weight: 100;
+        }
+
+        .editTextBox {
+          align-items: center;
+          width: 100%;
+          padding-top: 0.5vh;
+          padding-right: 0.5vh;
+
+          textarea {
+            padding: 1.5vh;
+            background: #e0e0e0;
+            border: none;
+            outline: none;
+            font-size: medium;
+            resize: none;
+            width: 100%;
+          }
+        }
+
+        .commentText {
+          white-space: pre-wrap;
+        }
+    }
+
+    // 編集モード時
+    .editing {
+        padding: 20px 40px 20px 15px;
+        width: 100%;
+    }
+
+    .commentTimeStamp {
+        color: #7b7c85;
+        margin-left: 20px;
+        font-size: 16px;
+    }
+
+    .MuiSvgIcon-root {
+        cursor: pointer;
+        padding: 0.2vh;
+    }
+
+    .commentActions {
+        display: flex;
+        align-items: center;
+    
+        .customCheckbox {
+          display: flex;
+          align-items: center;
+          position: relative;
+          padding-left: 24px;
+          margin-right: 5px;
+          margin-left: 10px;
+          cursor: pointer;
+          font-size: 22px;
+          user-select: none;
+        }
+    
+        .customCheckbox input {
+          position: absolute;
+          opacity: 0;
+          cursor: pointer;
+          height: 0;
+          width: 0;
+        }
+    
+        .checkmark {
+          position: absolute;
+          top: 50%;
+          left: 0;
+          height: 20px;
+          width: 20px;
+          background-color: #eee;
+          border-radius: 4px;
+          transform: translateY(-50%);
+        }
+    
+        .customCheckbox:hover input ~ .checkmark {
+          background-color: #ccc;
+        }
+    
+        .customCheckbox input:checked ~ .checkmark {
+          background-color: #2196F3;
+        }
+    
+        .checkmark:after {
+          content: "";
+          position: absolute;
+          display: none;
+        }
+    
+        .customCheckbox input:checked ~ .checkmark:after {
+          display: block;
+        }
+    
+        .customCheckbox .checkmark:after {
+          left: 7px;
+          top: 3px;
+          width: 5px;
+          height: 10px;
+          border: solid white;
+          border-width: 0 3px 3px 0;
+          transform: rotate(45deg);
+        }
+
+        .MuiSvgIcon-root {
+          color: #29355f;
+        }
+
+        .closeIcon {
+          color: gray;
+        }    
+    }
+}

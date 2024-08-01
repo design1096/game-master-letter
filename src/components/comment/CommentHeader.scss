@@ -1,0 +1,22 @@
+.commentHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 10px 8px;
+    height: 40px;
+    border-bottom: 1px solid #686a6e;
+
+    .commentHeaderLeft {
+        padding-left: 15px;
+
+        .commentHeaderHash {
+            color: #7b7c85;
+            padding-right: 7px;
+        }
+
+        h3 {
+            color: #29355f;
+        }
+    }
+}

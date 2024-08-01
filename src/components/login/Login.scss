@@ -1,0 +1,40 @@
+.login {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100vh;
+    padding: 0 1vh 0 1vh;
+    // gap: 5vh;
+
+    .title {
+        font-family: "Poiret One", sans-serif;
+        font-weight: 400;
+        font-style: normal;
+        font-size: 8vh;
+        color: #29355f;
+        margin-bottom: 1vh;
+    }
+
+    .description {
+        color: #29355f;
+        font-weight: 100;
+        font-size: 2vh;
+        margin-bottom: 6.5vh;
+    }
+
+    button {
+        width: 31vh;
+        height: 5.2vh;
+        border-radius: 1.1vh;
+        background-color: #29355f;
+        color: #eff2f5;
+        font-weight: 800;
+        font-size: 1.8vh;
+        
+        &:hover {
+            background-color: #030a23;
+        }
+    }
+}

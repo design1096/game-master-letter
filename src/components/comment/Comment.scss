@@ -1,0 +1,98 @@
+.comment {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100vh;
+
+    .commentList {
+        flex-grow: 1;
+        overflow-y: auto;
+        padding: 10px;
+        height: calc(100vh - 150px);
+        
+        /* スクロールバーを非表示にするスタイル */
+        scrollbar-width: none; /* Firefox */
+        -ms-overflow-style: none; /* Internet Explorer 10+ */
+
+        .commentButton {
+            padding: 20px 20px 20px 10px;
+            text-align: center;
+
+            .createLetterTxtBtn {
+                cursor: pointer;
+                text-align: center;
+                vertical-align: middle;
+                text-decoration: none;
+                margin: auto;
+                padding: 1rem 2rem;
+                font-weight: 800;
+                border-radius: 100vh;
+                border-bottom: 7px solid #29355F;
+                background: #3e4d75;
+                color: #fff;
+
+                &:hover {
+                    margin-top: 6px;
+                    border-bottom: 1px solid #29355F;
+                    color: #fff;
+                }
+            }
+
+        }
+    }
+
+    .commentList::-webkit-scrollbar {
+        display: none; /* Chrome, Safari, Opera */
+    }
+
+    .commentInput {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px;
+        // background-color: #d2efcf;
+        background-color: #a3adc8;
+        border-radius: 5px;
+        margin: 20px;
+        color: lightgray;
+
+        form {
+            display: flex;
+            flex-grow: 1;
+            align-items: center;
+            width: 100%;
+
+            textarea {
+                padding: 15px;
+                background: transparent;
+                border: none;
+                outline: none;
+                color: #29355f;
+                font-size: large;
+                flex-grow: 1;
+                resize: none;  // リサイズを無効にする
+                width: 100%;   // 幅を100%に固定
+                height: 5.5vh;  // 高さを固定（必要に応じて調整可能）
+            }
+
+            .commentInputButton {
+                display: none;
+            }
+
+            .commentInputIcons {
+                display: flex;
+                align-items: center;
+                justify-content: flex-end;
+                padding-left: 10px;
+                flex-shrink: 0;
+                
+                .MuiSvgIcon-root {
+                    padding: 10px;
+                    color: #29355f;
+                    cursor: pointer;
+                    font-size: 2.8vh;
+                }
+            }
+        }
+    }
+}

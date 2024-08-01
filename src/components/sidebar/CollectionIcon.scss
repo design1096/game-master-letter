@@ -1,0 +1,39 @@
+.collectionIcon {
+    width: 60px;
+    height: 60px;
+    background-color: #33363d;
+    border-radius: 9999px;
+    margin-bottom: 10px;
+    position: relative;
+    margin-top: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+
+    img {
+        // width: 50px;
+        // object-fit: cover;
+        // position: absolute;
+        // top: 50%;
+        // left: 50%;
+        // transform: translate(-50%, -50%);
+        // border-radius: 9999px;
+        // z-index: 1;
+        width: 100%;
+        height: 100%;
+        object-fit: cover; /* 画像をアイコンの中に収める */
+        border-radius: 9999px;
+        z-index: 1;
+    }
+
+    &:hover {
+        opacity: 0.8;
+    }
+}
+
+.collectionIcon.selected {
+    border: 2px solid #fff; /* 選択されている場合のスタイル例 */
+    box-shadow: 0 0 9px rgba(255, 255, 255, 0.5);
+    z-index: 2;
+}

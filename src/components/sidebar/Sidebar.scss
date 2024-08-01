@@ -1,0 +1,179 @@
+.sidebar {
+    display: flex;
+    flex: 0.3;
+    height: 100vh;
+
+    .sidebarLeft {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background-color: #3e4d75;
+        padding: 15px 10px;
+        overflow-y: auto;
+        max-height: 100%;
+
+        .collectionIcon {
+            width: 65px;
+            height: 65px;
+            background-color: #29355F;
+            border-radius: 9999px;
+            margin-bottom: 10px;
+            position: relative;
+            margin-top: 7px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+
+            .MuiSvgIcon-root {
+                color: white;
+                font-size: 35px;
+            }
+
+            .iconPlaceholder {
+                color: #ccc;
+            }
+
+            &:hover {
+                opacity: 0.7;
+            }
+        }
+
+        /* スクロールバーを非表示にするスタイル */
+        -ms-overflow-style: none;  /* IEとEdge用 */
+        scrollbar-width: none;  /* Firefox用 */
+    }
+
+    .sidebarRight {
+        background-color: #29355F;
+        width: 300px;
+        position: relative;
+        flex-grow: 1;
+
+        .saidebarRightTop {
+            color: #ffff;
+
+            .collectionName {
+                display: flex;
+                flex-direction: column;
+                padding: 20px;
+
+                .collectionNameRow {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                }
+
+                h3 {
+                    margin: 0 0.3vh 0 0;
+                }
+
+                span {
+                    align-self: flex-start;
+                    margin-top: 10px;
+                }
+
+                .collectionCategory {
+                    padding-top: 10px;
+                }
+
+                .MuiSvgIcon-root {
+                    cursor: pointer;
+                }
+            }
+        }
+
+        .saidebarRightCenter {
+            color: #ffff;
+            flex-grow: 1;
+            overflow-y: auto;
+
+            .sidebarRightCenterTop {
+                padding: 13px 21px 13px 13px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+
+                .sidebarRightCenterHeader {
+                    color: #ffff;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-top: 5px;
+
+                    .MuiSvgIcon-root {
+                        cursor: pointer;
+                        margin-right: 5px;
+                    }
+                }
+
+                .addPlayerIcon {
+                    cursor: pointer;
+                }
+            }
+
+            .playerList {
+                height: auto; /* 変更 */
+                overflow-y: scroll; /* 追加 */
+                max-height: calc(100vh - 250px); /* フッターに被らないように調整 */
+                
+                /* スクロールバーを非表示にするスタイル */
+                -ms-overflow-style: none;  /* IEとEdge用 */
+                scrollbar-width: none;  /* Firefox用 */
+            }
+
+            .playerList::-webkit-scrollbar {
+                display: none;  /* Chrome, Safari, Opera用 */
+            }
+        }
+
+        .sidebarRightFooter {
+            position: absolute;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 20px 25px 20px;
+            border-top: 1px solid #686a6e;
+            // width: calc(100% - 6px);
+            width: 100%;
+            box-sizing: border-box;
+
+            .accountInfo {
+                display: flex;
+                align-items: center;
+
+                img {
+                    width: 60px;
+                    border-radius: 50%;
+                    margin-right: 10px;
+                }
+
+                .accountName {
+                    margin-left: 10px;
+
+                    h4 {
+                        color: white;
+                        font-weight: 500;
+                        margin-bottom: 8px;
+                    }
+
+                    button {
+                        padding: 4px 10px;
+                        border: none;
+                        border-radius: 4px;
+                        cursor: pointer;
+                        white-space: nowrap;
+                        font-size: 1.4vh;
+                        background-color: #686a6e;
+                        color: #ccc;
+
+                        &:hover {
+                            opacity: 0.8;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
