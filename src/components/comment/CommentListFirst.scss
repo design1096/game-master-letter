@@ -14,14 +14,56 @@
           font-weight: 100;
         }
 
+        .editTextBox {
+            align-items: center;
+            width: 100%;
+            padding-top: 0.5vh;
+            padding-right: 0.5vh;
+  
+            textarea {
+              padding: 1.5vh;
+              background: #e0e0e0;
+              border: none;
+              outline: none;
+              font-size: medium;
+              resize: none;
+              width: 100%;
+              height: 10vh;
+            }
+          }
+
         .commentText {
             white-space: pre-wrap;
         }
+    }
+
+    // 編集モード時
+    .editing {
+        padding: 20px 40px 20px 15px;
+        width: 100%;
     }
 
     .commentTimeStamp {
         color: #7b7c85;
         margin-left: 20px;
         font-size: 16px;
+    }
+
+    .MuiSvgIcon-root {
+        cursor: pointer;
+        padding: 0.2vh;
+    }
+
+    .commentActions {
+        display: flex;
+        align-items: center;
+
+        .MuiSvgIcon-root {
+          color: #29355f;
+        }
+
+        .closeIcon {
+          color: gray;
+        }    
     }
 }

@@ -164,10 +164,30 @@ const Comment = () => {
     }
   };
 
+  // レター本文編集→保存機能
+  const handleSaveLetterBody = async (id: string, newLetter: string) => {
+    if (collectionId && playerId) {
+      const letterRef = doc(db, "collections", collectionId, "players", playerId, "letters", id);
+      await updateDoc(letterRef, {
+        letterBody: newLetter,
+        timestamp: serverTimestamp(),
+      });
+      // 必要に応じてコメントリストを再取得する処理を追加
+    } else {
+      console.error("collectionIdまたはplayerIdがnullです");
+    }
+  };
+
   // コメント削除関数
   const deleteComment = async (commentId: string) => {
     const commentDocRef = doc(db, "collections", String(collectionId), "players", String(playerId), "comments", commentId);
     await deleteDoc(commentDocRef);
+  };
+
+  // レター本文削除機能
+  const deleteLetterBody = async (letterId: string) => {
+    const letterDocRef = doc(db, "collections", String(collectionId), "players", String(playerId), "letters", letterId);
+    await deleteDoc(letterDocRef);
   };
 
   // アイコンのクリック関数
@@ -230,6 +250,8 @@ const Comment = () => {
             id={letter.id}
             letterBody={letter.letterBody}
             timestamp={letter.timestamp}
+            onDelete={() => deleteLetterBody(letter.id)}
+            onSave={handleSaveLetterBody}
           />
         ))}
       </div>

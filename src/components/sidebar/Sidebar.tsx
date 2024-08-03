@@ -433,6 +433,7 @@ const Sidebar = () => {
         {/* プレイヤー情報 */}
         <div className='saidebarRightCenter'>
           {/* コレクションが選択された場合に表示 */}
+          {/* プレイヤー情報リスト ヘッダー */}
           {selectedCollection && (
             <div className='sidebarRightCenterTop'>
               <div className='sidebarRightCenterHeader'>
