@@ -7,6 +7,7 @@ interface Letters {
     id: string;
     timestamp: Timestamp | null;
     letterBody: string;
+    createDesignFlg: number;
     user: {
         uid: string;
         photo: string;
@@ -44,6 +45,7 @@ const useThirdTwoCollection = (collectionName: string, secondCollectionName: str
                     id: doc.id,
                     timestamp: doc.data().timestamp,
                     letterBody: doc.data().letterBody,
+                    createDesignFlg: 0,
                     user: doc.data().user,
                 });
             });

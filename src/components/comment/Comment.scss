@@ -27,17 +27,36 @@
                 padding: 1rem 2rem;
                 font-weight: 800;
                 border-radius: 100vh;
-                border-bottom: 7px solid #29355F;
+                border-bottom: 5px solid #29355F;
                 background: #3e4d75;
                 color: #fff;
 
                 &:hover {
-                    margin-top: 6px;
+                    margin-top: 4px;
                     border-bottom: 1px solid #29355F;
                     color: #fff;
                 }
             }
 
+            .createDesignTxtBtn {
+                cursor: pointer;
+                text-align: center;
+                vertical-align: middle;
+                text-decoration: none;
+                margin: auto;
+                padding: 1rem 2rem;
+                font-weight: 800;
+                border-radius: 100vh;
+                border-bottom: 5px solid #AE6362;
+                background: #C98382;
+                color: #fff;
+
+                &:hover {
+                    margin-top: 4px;
+                    border-bottom: 1px solid #AE6362;
+                    color: #fff;
+                }
+            }
         }
     }
 
@@ -91,6 +110,72 @@
                     color: #29355f;
                     cursor: pointer;
                     font-size: 2.8vh;
+                }
+            }
+        }
+    }
+
+    .letterDisplay {
+        padding: 5vh;
+        display: flex;
+
+        .letterBodySquare {
+            background: #C98382;
+            padding: 5vh;
+            width: 50vh;
+            height: auto;
+            margin-right: 5vh;
+
+            .letterBodyText {
+                white-space: pre-wrap;
+                color: 3e4d75;
+                font-size: 2vh;
+            }
+        }
+    }
+
+    .downloadDisplay {
+        .downloadButton {
+            padding: 1vh 2vh 1vh 2vh;
+            text-align: center;
+
+            .downloadTxtBtn {
+                cursor: pointer;
+                text-align: center;
+                vertical-align: middle;
+                text-decoration: none;
+                margin: auto;
+                padding: 1rem 2rem;
+                font-weight: 800;
+                border-radius: 100vh;
+                border-bottom: 5px solid #AE6362;
+                background: #C98382;
+                color: #fff;
+
+                &:hover {
+                    margin-top: 4px;
+                    border-bottom: 1px solid #AE6362;
+                    color: #fff;
+                }
+            }
+
+            .backTxtBtn {
+                cursor: pointer;
+                text-align: center;
+                vertical-align: middle;
+                text-decoration: none;
+                margin: auto;
+                padding: 1rem 2rem;
+                font-weight: 800;
+                border-radius: 100vh;
+                border-bottom: 5px solid #807A7A;
+                background: #ABA4A4;
+                color: #fff;
+
+                &:hover {
+                    margin-top: 4px;
+                    border-bottom: 1px solid #807A7A;
+                    color: #fff;
                 }
             }
         }

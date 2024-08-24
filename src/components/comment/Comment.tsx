@@ -1,17 +1,20 @@
 import React, { useEffect, useRef, useState } from 'react'
 import './Comment.scss';
 import CommentHeader from './CommentHeader';
+import LetterHeader from './LetterHeader';
 import CommentList from './CommentList';
 import { useAppSelector } from '../../app/hooks';
 import SendIcon from '@mui/icons-material/Send';
 import { db } from '../../firebase';
-import { collection, addDoc, serverTimestamp, doc, deleteDoc, updateDoc, CollectionReference, DocumentData } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, doc, deleteDoc, updateDoc, CollectionReference, DocumentData, getDocs } from 'firebase/firestore';
 import useThirdCollection from '../../hooks/useThirdCollection';
 import useThirdTwoCollection from '../../hooks/useThirdTwoCollection';
 import CommentListFirst from './CommentListFirst';
 import { Button } from '@mui/material';
 import axios from 'axios';
 import LetterBody from './LetterBody';
+import { SketchPicker } from 'react-color';
+import html2canvas from 'html2canvas';
 
 const Comment = () => {
   const [inputText, setInputText] = useState<string>("");
@@ -28,9 +31,30 @@ const Comment = () => {
   const { thirdTwoDocuments: letters } = useThirdTwoCollection("collections", "players", "letters"); // レター
   const commentListRef = useRef<HTMLDivElement>(null);
   const [isComposing, setIsComposing] = useState(false); // 日本語入力の変換中かどうかを判定
+  const [lettersState, setLettersState] = useState<DocumentData[]>(letters);
+  const [backgroundColor, setBackgroundColor] = useState<string>('#C98382'); // 初期レター背景色
+  const letterBodyRef = useRef<HTMLDivElement>(null);
   const MAX_TEXT_LENGTH = 1000; // 文字数最大値
   const ZERO = 0;
+  const ONE = 1;
   const THREE = 3;
+
+  // レター情報の取得と設定
+  useEffect(() => {
+    const fetchLetters = async () => {
+      if (collectionId && playerId) {
+        try {
+          const lettersCollectionRef = collection(db, "collections", collectionId, "players", playerId, "letters");
+          const lettersSnapshot = await getDocs(lettersCollectionRef);
+          const lettersData = lettersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          setLettersState(lettersData);
+        } catch (error) {
+          console.error("レター情報の取得に失敗しました: ", error);
+        }
+      }
+    };
+    fetchLetters();
+  }, [collectionId, playerId]);
 
   // ▼▼▼ デジタルレター作成 ▼▼▼
   // コレクションIDまたはプレイヤーIDが変更されたときに選択したコメントをクリア
@@ -46,7 +70,7 @@ const Comment = () => {
   };
 
   // OpenAI APIを呼び出す関数
-  const generateLetter = async () => {
+  const generateLetterBody = async () => {
     if (selectedComments.length == ZERO) {
       alert("コメントは1件以上選択してください。");
       return;
@@ -58,19 +82,20 @@ const Comment = () => {
 
     const prompt = `私の名前はゲームマスターの${user?.displayName}です。
     プレイヤーの${playerName}さんへの素敵な手紙を書いてください。
-    手紙はカジュアルでポジティブなトーンで、以下のポイントを含めてください。
+    手紙はポジティブなトーンで、以下のポイントを含めてください。
 
     【手紙の体裁について】
     - 文章の始まりに「${user?.displayName}様」は不要。
     - 日本語で書くこと。
     - 最後に感謝の言葉を添えること。
-    - 文章の長さは便箋1枚程度（300文字以内）に収めること。
+    - 文章の長さは便箋1枚程度（300文字程度）に収めること。
+    - 途中で文章が切れないようにすること。
 
     【手紙の内容について】
     - 一緒に遊んだゲームのジャンルは「${collectionCategory}」で、作品名は「${collectionTitle}」である。
     - ${playerName}さんが演じた役割は${roleName}である。
     - 下記の【ゲーム中に書き残したコメント】は、プレイ中に私がゲームマスター視点で感じたプレイヤーの${playerName}さんへ向けたコメントである。
-    - コメントを用いて、${playerName}さんのロールプレイやストーリーについての感想を共有したい。
+    - コメントを用いながら、${playerName}さんのロールプレイやストーリーについての感想を共有したい。
 
     【ゲーム中に書き残したコメント】
     - ${selectedComments.join('\n- ')}`;
@@ -97,10 +122,21 @@ const Comment = () => {
           playerId, 
           "letters"
         ), {
-          letterBody: props,
+          letterBody: props, // レター本文のテキスト
+          createDesignFlg: ZERO, // 「デジタルレターを作成する」ボタンが押下されたかどうかのフラグ（0:押下前/1:押下後）
           timestamp: serverTimestamp(),
           user: user,
         });
+
+        // 新しく生成されたレター情報をlettersStateに追加
+        const newLetter = {
+          id: docRef.id,
+          letterBody: props,
+          createDesignFlg: ZERO,
+          timestamp: serverTimestamp(),
+          user: user,
+        };
+        setLettersState(prevLetters => [...prevLetters, newLetter]);
       } catch (error) {
         console.error("レター本文の登録に失敗しました: ", error);
       }
@@ -164,15 +200,43 @@ const Comment = () => {
     }
   };
 
-  // レター本文編集→保存機能
+  // レター：レター本文編集→保存機能
   const handleSaveLetterBody = async (id: string, newLetter: string) => {
     if (collectionId && playerId) {
       const letterRef = doc(db, "collections", collectionId, "players", playerId, "letters", id);
-      await updateDoc(letterRef, {
-        letterBody: newLetter,
-        timestamp: serverTimestamp(),
-      });
-      // 必要に応じてコメントリストを再取得する処理を追加
+      try {
+        await updateDoc(letterRef, {
+          letterBody: newLetter,
+          timestamp: serverTimestamp(),
+        });
+        // レター保存後にlettersStateを更新
+        const updatedLetters = lettersState.map(letter =>
+          letter.id === id ? { ...letter, letterBody: newLetter, timestamp: serverTimestamp() } : letter
+        );
+        setLettersState(updatedLetters);
+      } catch (error) {
+        console.error("レター本文の更新に失敗しました: ", error);
+      }
+    }
+  };
+
+  // レター：フラグ編集→保存機能
+  const updateCreateDesignFlg = async (letterId: string, flgNum: number) => {
+    if (collectionId && playerId) {
+      const letterRef = doc(db, "collections", collectionId, "players", playerId, "letters", letterId);
+      try {
+        await updateDoc(letterRef, {
+          createDesignFlg: flgNum,
+        });
+        // ローカルの状態も更新
+        setLettersState(prevLetters =>
+          prevLetters.map(letter =>
+            letter.id === letterId ? { ...letter, createDesignFlg: flgNum } : letter
+          )
+        );
+      } catch (error) {
+        console.error("createDesignFlgの更新に失敗しました: ", error);
+      }
     } else {
       console.error("collectionIdまたはplayerIdがnullです");
     }
@@ -186,8 +250,19 @@ const Comment = () => {
 
   // レター本文削除機能
   const deleteLetterBody = async (letterId: string) => {
-    const letterDocRef = doc(db, "collections", String(collectionId), "players", String(playerId), "letters", letterId);
-    await deleteDoc(letterDocRef);
+    if (collectionId && playerId) {
+      const letterDocRef = doc(db, "collections", String(collectionId), "players", String(playerId), "letters", letterId);
+      try {
+        await deleteDoc(letterDocRef);
+        
+        // レター削除後にlettersStateを更新
+        const updatedLetters = lettersState.filter(letter => letter.id !== letterId);
+        setLettersState(updatedLetters);
+  
+      } catch (error) {
+        console.error("レター本文の削除に失敗しました: ", error);
+      }
+    }
   };
 
   // アイコンのクリック関数
@@ -203,7 +278,7 @@ const Comment = () => {
     }
   }, [comments]);
 
-  // playerId が null の場合は何も表示しない
+  // playerIdがnullの場合は何も表示しない
   if (!playerId) {
     return (
       <div className='comment'></div>
@@ -218,70 +293,154 @@ const Comment = () => {
     }
   };
 
+  // 表示するヘッダーを条件に基づいて切り替える
+  const renderHeader = () => {
+    if (lettersState.length === 0 || lettersState.some(letter => letter.createDesignFlg === ZERO)) {
+      return <CommentHeader playerName={playerName} roleName={roleName} />;
+    } else if (lettersState.some(letter => letter.createDesignFlg === ONE)) {
+      return <LetterHeader playerName={playerName} roleName={roleName} />;
+    }
+    return null;
+  };
+
+  // レター背景色のカラーピッカーの色が変更されたときに呼び出される関数
+  const handleBackColorChange = (color: any) => {
+    setBackgroundColor(color.hex);
+  };
+
+  // デジタルレターをダウンロードボタン押下時処理
+  const handleDownload = () => {
+    if (letterBodyRef.current) {
+      html2canvas(letterBodyRef.current).then((canvas) => {
+        const link = document.createElement('a');
+        link.download = 'digital-letter.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      });
+    }
+  };
+
   return (
     <div className='comment'>
-      {/* コメントヘッダー */}
-      <CommentHeader playerName={playerName} roleName={roleName} />
-      {/* コメントリスト */}
-      <div className='commentList' ref={commentListRef}>
-        <CommentListFirst timestamp={playertTimestamp}/>
-        {comments.map((comment) => (
-          <CommentList
-            key={comment.id} 
-            id={comment.id}
-            comment={comment.comment} 
-            timestamp={comment.timestamp}
-            user={comment.user} 
-            onDelete={() => deleteComment(comment.id)}
-            onSelect={handleCommentSelect}
-            onSave={handleSaveComment}
-          />
-        ))}
-        {/* コメントが3件以上かつレターが0件の場合にボタンを表示 */}
-        {comments.length >= THREE && letters.length === ZERO && (
-          <div className='commentButton'>
-            <Button className='createLetterTxtBtn' onClick={generateLetter}>デジタルレターの文章を作成する</Button>
+      {/* 条件に基づいてヘッダーを表示 */}
+      {renderHeader()}
+      {/* 条件に基づいてボディーを表示 */}
+      {(lettersState.length === 0 || lettersState.some(letter => letter.createDesignFlg === ZERO)) && !lettersState.some(letter => letter.createDesignFlg === ONE) ? (
+        <>
+          {/* コメントリスト */}
+          <div className='commentList' ref={commentListRef}>
+            <CommentListFirst timestamp={playertTimestamp}/>
+            {comments.map((comment) => (
+              <CommentList
+                key={comment.id} 
+                id={comment.id}
+                comment={comment.comment} 
+                timestamp={comment.timestamp}
+                user={comment.user} 
+                onDelete={() => deleteComment(comment.id)}
+                onSelect={handleCommentSelect}
+                onSave={handleSaveComment}
+              />
+            ))}
+            {/* コメントが3件以上かつレターが0件の場合にボタンを表示 */}
+            {comments.length >= THREE && letters.length === ZERO && (
+              <div className='commentButton'>
+                <Button className='createLetterTxtBtn' onClick={generateLetterBody}>デジタルレターの文章を作成する</Button>
+              </div>
+            )}
+            {/* レターが存在する場合 */}
+            {letters.map((letter) => (
+              <LetterBody 
+                key={letter.id} 
+                id={letter.id}
+                letterBody={letter.letterBody}
+                timestamp={letter.timestamp}
+                onDelete={() => deleteLetterBody(letter.id)}
+                onSave={handleSaveLetterBody}
+              />
+            ))}
+            {/* createDesignFlgが0の場合にボタンを表示 */}
+            {lettersState.some(letter => letter.createDesignFlg === ZERO) && (
+              <div className='commentButton'>
+                <Button 
+                  className='createDesignTxtBtn' 
+                  onClick={() => {
+                    const letterToUpdate = lettersState.find(letter => letter.createDesignFlg === ZERO);
+                    if (letterToUpdate) {
+                      updateCreateDesignFlg(letterToUpdate.id, ONE);
+                    }
+                  }}
+                >
+                  デジタルレターを作成する
+                </Button>
+              </div>
+            )}
           </div>
-        )}
-        {/* レターが存在する場合 */}
-        {letters.map((letter) => (
-          <LetterBody 
-            key={letter.id} 
-            id={letter.id}
-            letterBody={letter.letterBody}
-            timestamp={letter.timestamp}
-            onDelete={() => deleteLetterBody(letter.id)}
-            onSave={handleSaveLetterBody}
-          />
-        ))}
-      </div>
-      {/* コメント送信 */}
-      <div className='commentInput'>
-        <form onSubmit={registerComment}>
-          <textarea
-            value={inputText}
-            placeholder={`# ${playerName}（${roleName}）さんへのコメントを送信`} 
-            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => 
-              setInputText(e.target.value)
-            }
-            onKeyDown={handleKeyPress} // エンターキーとシフト＋エンターキーの処理を追加
-            onCompositionStart={() => setIsComposing(true)} // 変換開始
-            onCompositionEnd={() => setIsComposing(false)} // 変換終了
-            rows={1}
-          />
-          <button 
-            type='submit' 
-            className='commentInputButton'
-            onClick={(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => 
-              registerComment(e)}
-          >
-            送信
-          </button>
-          <div className='commentInputIcons' onClick={handleIconClick}>
-            <SendIcon />
+          {/* コメント送信 */}
+          <div className='commentInput'>
+            <form onSubmit={registerComment}>
+              <textarea
+                value={inputText}
+                placeholder={`# ${playerName}（${roleName}）さんへのコメントを送信`} 
+                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => 
+                  setInputText(e.target.value)
+                }
+                onKeyDown={handleKeyPress} // エンターキーとシフト＋エンターキーの処理を追加
+                onCompositionStart={() => setIsComposing(true)} // 変換開始
+                onCompositionEnd={() => setIsComposing(false)} // 変換終了
+                rows={1}
+              />
+              <button 
+                type='submit' 
+                className='commentInputButton'
+                onClick={(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => 
+                  registerComment(e)}
+              >
+                送信
+              </button>
+              <div className='commentInputIcons' onClick={handleIconClick}>
+                <SendIcon />
+              </div>
+            </form>
           </div>
-        </form>
-      </div>
+        </>
+      ) : (
+        <>
+          {/* レターの表示 */}
+          {lettersState.filter(letter => letter.createDesignFlg === ONE).map((letter) => (
+            <div key={letter.id} className='letterDisplay'>
+              <div className='letterBodySquare' style={{ backgroundColor: backgroundColor }} ref={letterBodyRef}>
+                <p className='letterBodyText'>{letter.letterBody}</p>
+              </div>
+              {/* カラーピッカーの表示 */}
+              <SketchPicker 
+                color={backgroundColor} 
+                onChange={handleBackColorChange} 
+              />
+            </div>
+          ))}
+          <div className='downloadDisplay'>
+            <div className='downloadButton'>
+              <Button className='downloadTxtBtn' onClick={handleDownload}>デジタルレターをダウンロード</Button>
+            </div>
+            {lettersState.some(letter => letter.createDesignFlg === ONE) && (
+              <div className='downloadButton'>
+                <Button 
+                  className='backTxtBtn' 
+                  onClick={() => {
+                    const letterToUpdate = lettersState.find(letter => letter.createDesignFlg === ONE);
+                    if (letterToUpdate) {
+                      updateCreateDesignFlg(letterToUpdate.id, ZERO);
+                    }
+                  }}
+                >
+                  コメント登録画面に戻る
+                </Button>
+              </div>
+            )}       
+          </div>
+        </>
+      )}
     </div>
   )
 }
